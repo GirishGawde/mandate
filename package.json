@@ -1,0 +1,14 @@
+{
+  "name": "mandate",
+  "version": "0.1.0",
+  "description": "Spending guardrails for AI agents, with PayPal sandbox payments",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "demo:core": "node scripts/demo-core.js"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
+}
