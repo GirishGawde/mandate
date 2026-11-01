@@ -43,8 +43,6 @@ Legend: ✅ done and tested · ⚠️ written, untested · 🔲 to build · (opt
 mandate/
 ├── ARCHITECTURE.md                  ✅ this file
 ├── AGENTS.md                        ✅ rules for IDE agents (read first)
-├── CLAUDE.md                        ✅ pointer → AGENTS.md
-├── GEMINI.md                        ✅ pointer → AGENTS.md
 ├── README.md                        ✅ setup, demo link, what's mocked, third-party services
 ├── LICENSE                          ✅ MIT (must be visible at repo root)
 ├── package.json                     ✅ type: module; scripts: test, demo:core (+ dev, build, start 🔲)
