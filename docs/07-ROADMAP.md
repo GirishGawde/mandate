@@ -11,13 +11,13 @@ Rule: when you finish a task, tick it here. Keep "Open questions" current.
 - [x] Mock PayPal client + real sandbox client (**real untested**)
 - [x] Terminal demo `npm run demo:core`; 27 tests passing
 - [x] Project docs + `AGENTS.md`
+- [x] PayPal developer sign-up
 - [ ] Create GitHub public repo, first commit (keep honest history)
-- [ ] PayPal developer sign-up (blocked on phone OTP — retry in ~24h / other route / ask organizers)
 
 ## Day 2 — Mon Nov 2: PayPal sandbox + LLM plumbing
-- [ ] Sandbox REST app + business & personal sandbox accounts; keys in `.env`
+- [x] Sandbox REST app + business & personal sandbox accounts; keys in `.env`
 - [ ] `PAYPAL_MODE=sandbox npm run demo:core` → fix `real.js`; confirm authorize→capture visible in sandbox dashboard
-- [ ] Path A/B spike; record result in `docs/03`
+- [x] Path A/B spike; record result in `docs/03`
 - [ ] `src/agents/llm.js` (provider switch, injected `llm`) + scripted mode skeleton
 - [ ] `mandateParser.js` + tests (fake llm)
 

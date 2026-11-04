@@ -17,6 +17,12 @@ export function createMockClient() {
       orders.set(orderId, { amount, currency, description, status: 'CREATED' });
       return { id: orderId, status: 'CREATED', approveUrl: `https://sandbox.paypal.example/approve/${orderId}` };
     },
+    async getOrder(orderId) {
+      rec('getOrder', { orderId });
+      const o = orders.get(orderId);
+      if (!o) throw new Error(`Mock PayPal: unknown order ${orderId}`);
+      return { id: orderId, status: o.status };
+    },
     async authorizeOrder(orderId) {
       rec('authorizeOrder', { orderId });
       const o = orders.get(orderId);

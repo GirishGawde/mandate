@@ -5,9 +5,10 @@ Hackathon note: PayPal must be central; the whole money lifecycle runs through P
 
 ## Status
 - `src/paypal/mock.js` — complete, used by tests/demo.
-- `src/paypal/real.js` — **written from docs, UNTESTED**. First sandbox run will likely need small fixes.
+- `src/paypal/real.js` — verified against live sandbox (`v1/oauth2/token`, `POST /v2/checkout/orders`, `GET /v2/checkout/orders/{id}`).
 - Interface (identical for both):
   - `createOrder({referenceId, amount, currency, description}) → {id, status, approveUrl}`
+  - `getOrder(orderId) → {id, status}`
   - `authorizeOrder(orderId) → {authorizationId, status}`
   - `captureAuthorization(authorizationId) → {captureId, status}`
   - `voidAuthorization(authorizationId) → {status}`
@@ -15,14 +16,16 @@ Hackathon note: PayPal must be central; the whole money lifecycle runs through P
 ## Sandbox setup (one-time)
 1. Sign in at developer.paypal.com → Dashboard → **Apps & Credentials** → Sandbox.
 2. Create a REST app → copy **Client ID** and **Secret** into `.env` (`PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`). Never commit.
-3. Sandbox accounts: use/create one **Business** (merchant) and one **Personal** (buyer). Note their sandbox emails/passwords privately.
+3. **Sandbox accounts (IMPORTANT)**: Create one **Business** (merchant) and one **Personal** (buyer) with **Country/Region: United States (US)**.
+   > **Note on Country/Region**: If your sandbox accounts are created with non-US regions (e.g. India / `IN`), PayPal blocks domestic USD payments with *"This seller doesn't accept payments in your currency"*. Always use US accounts for both merchant and buyer to allow USD transactions without domestic cross-border restrictions.
 4. Set `PAYPAL_MODE=sandbox`.
 5. (If sign-up blocks on phone verification, work in `PAYPAL_MODE=mock` and retry later; ask hackathon organizers.)
 
 ## Payment lifecycle (intent AUTHORIZE)
-1. `POST /v2/checkout/orders` with `intent: "AUTHORIZE"` → returns order id + approval link (`approve` or `payer-action`).
-2. Buyer opens approval link (sandbox buyer account) and approves; PayPal redirects to `return_url`.
+1. `POST /v2/checkout/orders` with `intent: "AUTHORIZE"` → returns order id + approval link (`approve` or `payer-action`), status `PAYER_ACTION_REQUIRED`.
+2. Buyer opens approval link (sandbox buyer account) and approves; PayPal redirects to `return_url`. Order status becomes `APPROVED`.
 3. `POST /v2/checkout/orders/{id}/authorize` → authorization id. Funds are **held**.
+   > **Note**: Calling `authorizeOrder` before the buyer finishes approval in the browser returns `422 UNPROCESSABLE_ENTITY: ORDER_NOT_APPROVED`. Use `getOrder(orderId)` to confirm status is `APPROVED` first.
 4. On delivery: `POST /v2/payments/authorizations/{id}/capture` → capture id.
 5. If delivery fails/cancel: `POST /v2/payments/authorizations/{id}/void`.
 
@@ -30,11 +33,11 @@ Facts (from PayPal docs, verify if behavior differs): an authorization is valid 
 
 Send a unique `PayPal-Request-Id` header on POSTs (idempotency) — `real.js` does this.
 
-## Open spike: Path A vs Path B  (resolve first, record result here)
+## Spike result: Path A vs Path B (RESOLVED: Path B)
 Question: can the backend complete payment for an in-mandate purchase **without** the buyer clicking through PayPal each time (e.g. vaulted/saved sandbox payment method)?
-- **Path A (autonomous):** in-mandate purchases pay with no human step. Strongest story.
-- **Path B (one-tap):** every purchase needs the PayPal approval click. The guardrail still blocks bad purchases *before any order is created*; demo shows a one-tap approval. Fully acceptable.
-Result: _TBD — fill in after testing_. Do not build Path A-only features until confirmed.
+- **Path A (autonomous):** In-mandate purchases pay with no human step. Requires PayPal Vault / Payment Method Tokens (complex setup requiring advanced sandbox approval and vaulted customer consent).
+- **Path B (one-tap buyer approval — CHOSEN FOR HACKATHON):** Every purchase passes through the deterministic Mandate policy engine first (blocking invalid spending *before* any PayPal order is created). For allowed purchases, the buyer performs a one-tap approval via the PayPal redirect URL.
+- **Result:** **Path B adopted.** It cleanly showcases the core Mandate guardrails, works reliably on standard sandbox credentials without special merchant vault approvals, and fits the hackathon demo perfectly.
 
 ## Return/cancel handling (Path B)
 - `PAYPAL_RETURN_URL` → `app/api/paypal/return` handler: read the order `token`, find purchase by `orderId`, call `authorizePurchase`, redirect to the dashboard.
@@ -54,13 +57,13 @@ PayPal publishes an Agent Toolkit (`@paypal/agent-toolkit`) and a hosted MCP ser
 - Reasonable use: the **merchant agent** can use toolkit tools to create an invoice/order for the agreed deal, strengthening the "PayPal + AI" story. Only add this after the core flow works, and verify the toolkit's current API in its README.
 
 ## Testing checklist for first sandbox run
-- [ ] Token request succeeds
-- [ ] `createOrder` returns an approval link; opening it with the buyer sandbox account works
+- [x] Token request succeeds
+- [x] `createOrder` returns an approval link; opening it with the buyer sandbox account works
 - [ ] `authorizeOrder` returns an authorization id
 - [ ] `captureAuthorization` succeeds; transaction visible in the sandbox business account dashboard
 - [ ] `voidAuthorization` works on a fresh authorization
 - [ ] Error responses surface readable messages in the UI
-- [ ] Record Path A/B result above
+- [x] Record Path A/B result above
 - [ ] Webhook received and signature verified
 
 ## Risks

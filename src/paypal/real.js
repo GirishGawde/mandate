@@ -73,6 +73,10 @@ export function createRealClient({
       const link = order.links?.find((l) => l.rel === 'payer-action' || l.rel === 'approve');
       return { id: order.id, status: order.status, approveUrl: link?.href };
     },
+    async getOrder(orderId) {
+      const order = await api(`/v2/checkout/orders/${orderId}`, { method: 'GET' });
+      return { id: order.id, status: order.status };
+    },
     async authorizeOrder(orderId) {
       const res = await api(`/v2/checkout/orders/${orderId}/authorize`, { body: {} });
       const auth = res.purchase_units?.[0]?.payments?.authorizations?.[0];

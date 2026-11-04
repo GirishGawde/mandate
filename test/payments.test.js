@@ -81,3 +81,11 @@ test('cancelling voids the hold and frees the budget', async () => {
   const again = await proposePurchase({ mandate, purchase: buy({ amount: 50 }), ledger, paypal, now });
   assert.equal(again.status, 'awaiting_buyer_approval');
 });
+
+test('getOrder returns current order status', async () => {
+  const { ledger, paypal } = setup();
+  const { orderId } = await proposePurchase({ mandate, purchase: buy(), ledger, paypal, now });
+  const o = await paypal.getOrder(orderId);
+  assert.equal(o.id, orderId);
+  assert.equal(o.status, 'CREATED');
+});
