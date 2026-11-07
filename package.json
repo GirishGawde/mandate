@@ -9,6 +9,9 @@
     "demo:core": "node scripts/demo-core.js"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.97",
+    "@ai-sdk/google": "^4.0.112",
+    "ai": "^7.0.163",
     "zod": "^4.6.7"
   }
 }

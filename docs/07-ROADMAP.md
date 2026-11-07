@@ -18,14 +18,14 @@ Rule: when you finish a task, tick it here. Keep "Open questions" current.
 - [x] Sandbox REST app + business & personal sandbox accounts; keys in `.env`
 - [ ] `PAYPAL_MODE=sandbox npm run demo:core` → fix `real.js`; confirm authorize→capture visible in sandbox dashboard
 - [x] Path A/B spike; record result in `docs/03`
-- [ ] `src/agents/llm.js` (provider switch, injected `llm`) + scripted mode skeleton
-- [ ] `mandateParser.js` + tests (fake llm)
+- [x] `src/agents/llm.js` (provider switch, injected `llm`) + scripted mode skeleton
+- [x] `mandateParser.js` + tests (fake llm)
 
 ## Day 3 — Tue Nov 3: agents
-- [ ] `data/merchants.js` (catalog + floor prices + shady merchant)
-- [ ] `buyerAgent.js`, `merchantAgent.js`, `negotiation.js` with code-enforced rules + tests
-- [ ] Deal → proposal builder (code) → `proposePurchase`
-- [ ] Scripted-mode transcripts (normal deal + attack)
+- [x] `data/merchants.js` (catalog + floor prices + shady merchant)
+- [x] `buyerAgent.js`, `merchantAgent.js`, `negotiation.js` with code-enforced rules + tests
+- [x] Deal → proposal builder (code) → `proposePurchase`
+- [x] Scripted-mode transcripts (normal deal + attack)
 
 ## Day 4 — Wed Nov 4: server
 - [ ] Install Next.js, `jsconfig` alias, `app/` skeleton, runtime = nodejs
